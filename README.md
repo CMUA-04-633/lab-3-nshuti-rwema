@@ -1,8 +1,8 @@
 # Lab3-Embedded-System-Development
 
-# Done by:
+## Done by:
 
-## Bagirishya Rwema(bdominiq)  and NShuti(enshuti)
+### Bagirishya Rwema(bdominiq)  and NShuti(enshuti)
 
 
 
