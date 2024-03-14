@@ -1,8 +1,3 @@
-
-
-
-
-
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -23,14 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "liquidcrystal_i2c.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 #include<stdio.h>
 #include<string.h>
-#include <time.h>
 
 /* USER CODE END Includes */
 
@@ -58,10 +50,10 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+uint16_t lux=0;
 
-uint16_t converted_ADC_Value_l = 0;
+char msg[20];
 
-char formated_msg[50];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,8 +65,8 @@ static void MX_ADC2_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
-void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize);
-void temp_value_to_Fahrenheit(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize);
+void temp_conv_Celcius(uint16_t temp_var, char* outputBuffer, size_t bufferSize);
+void temp_conv_Fahrenheit(uint16_t temp_var, char* outputBuffer, size_t bufferSize);
 
 /* USER CODE END PFP */
 
@@ -87,41 +79,10 @@ void temp_value_to_Fahrenheit(uint16_t temper_value, char* convertedvalBuffer, s
   * @brief  The application entry point.
   * @retval int
   */
-
-// Variable to count the number of times the condition is met
-int i = 0;
-
-// Function to control the LED based on the light intensity
-void LED_on_Flash(int light) {
-    // Check if the light intensity is above a threshold (2000 in this case)
-    if (light > 2000) {
-        // Increment the counter
-        i = i + 1;
-
-        // Check if the counter reaches 5
-        if (i == 5) {
-            // Check the current state of GPIOA Pin 5
-            if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) != GPIO_PIN_SET) {
-                // If it's not set, set it
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-                // Reset the counter
-                i = 0;
-            } else {
-                // If it's set, reset it
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-                // Reset the counter
-                i = 0;
-            }
-        }
-    }
-}
-
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint16_t converted_ADC_Value_t;
-
+  uint16_t ADC_Val;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -152,9 +113,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-
-
   while (1)
   {
     /* USER CODE END WHILE */
@@ -162,51 +120,45 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  HAL_ADC_Start(&hadc1);
 	  HAL_ADC_Start(&hadc2);
-	  HAL_ADC_PollForConversion(&hadc1, 50);
+	  HAL_ADC_PollForConversion(&hadc1, 20);
 	  HAL_ADC_PollForConversion(&hadc2, 100);
-	  converted_ADC_Value_t = HAL_ADC_GetValue(&hadc2);
+	  ADC_Val = HAL_ADC_GetValue(&hadc2);
 	  HAL_ADC_Stop(&hadc1);
-	  converted_ADC_Value_l = HAL_ADC_GetValue(&hadc1);
-	  //sprintf(formated_msg, "Lv: %hu", converted_ADC_Value_l);
-	  sprintf(formated_msg, "Lv: %hu", converted_ADC_Value_l);
+	  lux = HAL_ADC_GetValue(&hadc1);
+	  sprintf(msg, "The Light: %hu", lux);
 
-	  LED_on_Flash(converted_ADC_Value_l);
+	  count_Flash(lux);
 
 
 	  /*START of LCD*/
 	  HD44780_Init(2);
 	  HD44780_Clear();
 	  HD44780_SetCursor(0,0);
-	  HD44780_PrintStr(formated_msg);
+	  HD44780_PrintStr(msg);
 	  HD44780_SetCursor(10,1);
 
 
 
-	  HAL_UART_Transmit(&huart2, (uint8_t *)formated_msg, strlen(formated_msg), HAL_MAX_DELAY);
-	  HAL_Delay(500);
+	  HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
+	  HAL_Delay(1500);
 
-	  char convertedtemperatureCelcius[150];
-	  char convertedtemperatureFahrenheit[150];
-	  temp_value_to_Celsius(converted_ADC_Value_t, convertedtemperatureCelcius, sizeof(convertedtemperatureCelcius));
-	  temp_value_to_Fahrenheit(converted_ADC_Value_t, convertedtemperatureFahrenheit, sizeof(convertedtemperatureFahrenheit));
+	  char temperatureOutputCelcius[100];
+	  char temperatureOutputFahrenheit[100];
+	  temp_conv_Celcius(ADC_Val, temperatureOutputCelcius, sizeof(temperatureOutputCelcius));
+	  temp_conv_Fahrenheit(ADC_Val, temperatureOutputFahrenheit, sizeof(temperatureOutputFahrenheit));
 
-	  HAL_UART_Transmit(&huart2, convertedtemperatureCelcius, strlen(convertedtemperatureCelcius), HAL_MAX_DELAY);
-	  HAL_UART_Transmit(&huart2, convertedtemperatureFahrenheit, strlen(convertedtemperatureFahrenheit), HAL_MAX_DELAY);
+	  HAL_UART_Transmit(&huart2, temperatureOutputCelcius, strlen(temperatureOutputCelcius), HAL_MAX_DELAY);
+	  HAL_UART_Transmit(&huart2, temperatureOutputFahrenheit, strlen(temperatureOutputFahrenheit), HAL_MAX_DELAY);
 
 	  HD44780_Clear();
 	  HD44780_SetCursor(0, 0);
-	  HD44780_PrintStr(convertedtemperatureCelcius);
-	  HAL_Delay(200);
+	  HD44780_PrintStr(temperatureOutputCelcius);
 
 	  HD44780_SetCursor(0, 1);
-	  HD44780_PrintStr(convertedtemperatureFahrenheit);
-	  HAL_Delay(200);
+	  HD44780_PrintStr(temperatureOutputFahrenheit);
+	  HAL_Delay(1500);
 
 	  /*END OF LCD*/
-
-	 // HAL_Delay(250);  // Delay for 1000 milliseconds
-
-
   }
   /* USER CODE END 3 */
 }
@@ -265,11 +217,13 @@ static void MX_ADC1_Init(void)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
+
   /* USER CODE END ADC1_Init 0 */
 
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
+
   /* USER CODE END ADC1_Init 1 */
 
   /** Common config
@@ -290,12 +244,13 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_13CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -309,11 +264,13 @@ static void MX_ADC2_Init(void)
 {
 
   /* USER CODE BEGIN ADC2_Init 0 */
+
   /* USER CODE END ADC2_Init 0 */
 
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC2_Init 1 */
+
   /* USER CODE END ADC2_Init 1 */
 
   /** Common config
@@ -334,12 +291,13 @@ static void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_13CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN ADC2_Init 2 */
+
   /* USER CODE END ADC2_Init 2 */
 
 }
@@ -353,9 +311,11 @@ static void MX_I2C1_Init(void)
 {
 
   /* USER CODE BEGIN I2C1_Init 0 */
+
   /* USER CODE END I2C1_Init 0 */
 
   /* USER CODE BEGIN I2C1_Init 1 */
+
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
@@ -371,6 +331,7 @@ static void MX_I2C1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN I2C1_Init 2 */
+
   /* USER CODE END I2C1_Init 2 */
 
 }
@@ -384,9 +345,11 @@ static void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
+
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
+
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
   huart2.Init.BaudRate = 115200;
@@ -401,6 +364,7 @@ static void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
+
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -448,34 +412,52 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
-    uint32_t Celsius_value = 0;
-    uint32_t Fahrenheit_value = 0;
+void temp_conv_Fahrenheit(uint16_t temp_var, char* outputBuffer, size_t bufferSize) {
+    uint32_t var1_Celsius = 0;
+    uint32_t var1_Fahrenheit = 0;
 
     // Convert temperature to Celsius
-    Celsius_value = (temper_value * 0.05);
+    var1_Celsius = (temp_var * 0.05);
 
     // Convert Celsius to Fahrenheit
-    Fahrenheit_value = ((Celsius_value * 9) / 5) + 32;
+    var1_Fahrenheit = ((var1_Celsius * 9) / 5) + 32;
 
     // Format the temperature statements into a single string
-    snprintf(convertedvalBuffer, bufferSize, "Cel: %lu C", Celsius_value);
+    snprintf(outputBuffer, bufferSize, "°Fahrenheit: %lu F", var1_Fahrenheit);
 }
 
-void temp_value_to_Fahrenheit(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
-    uint32_t Celsius_value = 0;
-    uint32_t Fahrenheit_value = 0;
+void temp_conv_Celcius(uint16_t temp_var, char* outputBuffer, size_t bufferSize) {
+    uint32_t var1_Celsius = 0;
+    uint32_t var1_Fahrenheit = 0;
 
     // Convert temperature to Celsius
-    Celsius_value = (temper_value * 0.05);
+    var1_Celsius = (temp_var * 0.05);
 
     // Convert Celsius to Fahrenheit
-    Fahrenheit_value = ((Celsius_value * 9) / 5) + 32;
+    var1_Fahrenheit = ((var1_Celsius * 9) / 5) + 32;
 
     // Format the temperature statements into a single string
-    snprintf(convertedvalBuffer, bufferSize, "Fahr: %lu F", Fahrenheit_value);
+    snprintf(outputBuffer, bufferSize, "°Celcius: %lu C", var1_Celsius);
+}
 
 
+void count_Flash(int lux) {
+
+	static int count = 0;
+    if (lux > 4000) {
+
+    	count++;
+    }
+    else if(count >= 5){
+
+    	count = 0;
+
+    	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
+    		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    	} else {
+    		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+    	}
+    }
 }
 
 
@@ -488,11 +470,11 @@ void temp_value_to_Fahrenheit(uint16_t temper_value, char* convertedvalBuffer, s
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-	  __disable_irq();
-	  while (1)
-	  {
-	  }
-
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -507,6 +489,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
