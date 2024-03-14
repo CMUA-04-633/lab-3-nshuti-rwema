@@ -2142,11 +2142,12 @@ void flash_Countering(int lux) {
  80010ce:	b082      	sub	sp, #8
  80010d0:	af00      	add	r7, sp, #0
  80010d2:	6078      	str	r0, [r7, #4]
+
     static int count = 0;
 
-    switch (lux > 4000) {
+    switch (lux > 900) {
  80010d4:	687b      	ldr	r3, [r7, #4]
- 80010d6:	f5b3 6f7a 	cmp.w	r3, #4000	; 0xfa0
+ 80010d6:	f5b3 7f61 	cmp.w	r3, #900	; 0x384
  80010da:	bfcc      	ite	gt
  80010dc:	2301      	movgt	r3, #1
  80010de:	2300      	movle	r3, #0
@@ -2181,12 +2182,14 @@ void flash_Countering(int lux) {
  800110c:	4603      	mov	r3, r0
  800110e:	2b01      	cmp	r3, #1
  8001110:	d105      	bne.n	800111e <flash_Countering+0x52>
+
                     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
  8001112:	2200      	movs	r2, #0
  8001114:	2120      	movs	r1, #32
  8001116:	4807      	ldr	r0, [pc, #28]	; (8001134 <flash_Countering+0x68>)
  8001118:	f001 f953 	bl	80023c2 <HAL_GPIO_WritePin>
                 } else {
+
                     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
                 }
             }

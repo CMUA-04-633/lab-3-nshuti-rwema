@@ -448,7 +448,7 @@ void flash_Countering(int lux) {
 
     static int count = 0;
 
-    switch (lux > 4000) {
+    switch (lux > 900) {
         case 1:
             count++;
             break;

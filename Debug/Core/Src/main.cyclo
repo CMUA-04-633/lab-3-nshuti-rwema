@@ -9,4 +9,4 @@
 ../Core/Src/main.c:415:6:temp_conv_Fahrenheit	1
 ../Core/Src/main.c:435:6:coversion_to_Celicius	1
 ../Core/Src/main.c:447:6:flash_Countering	5
-../Core/Src/main.c:474:6:Error_Handler	1
+../Core/Src/main.c:478:6:Error_Handler	1
