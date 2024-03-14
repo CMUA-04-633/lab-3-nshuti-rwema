@@ -4,6 +4,9 @@
 
 ### Bagirishya Rwema(bdominiq)  and NShuti(enshuti)
 
+#### Comments:
+the lab was quite
+
 
 
 -------
