@@ -41,11 +41,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_line   0000e037  00000000  00000000  00046abc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    0008a75a  00000000  00000000  00054af3  2**0
+ 19 .debug_str    0008a798  00000000  00000000  00054af3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00003464  00000000  00000000  000df250  2**2
+ 20 .debug_frame  00003464  00000000  00000000  000df28c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000064  00000000  00000000  000e26b4  2**0
+ 21 .debug_line_str 00000064  00000000  00000000  000e26f0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1314,8 +1314,8 @@ int main(void)
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config();
- 8000bc6:	f000 f8a3 	bl	8000d10 <SystemClock_Config>
+  Configuration_of_SystemClock();
+ 8000bc6:	f000 f8a3 	bl	8000d10 <Configuration_of_SystemClock>
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -1416,12 +1416,12 @@ int main(void)
 
 	  char convertedtemperatureCelcius[150];
 	  char convertedtemperatureFahrenheit[150];
-	  temp_value_to_Celsius(converted_ADC_Value_t, convertedtemperatureCelcius, sizeof(convertedtemperatureCelcius));
+	  celisius_Conversion_Temperature(converted_ADC_Value_t, convertedtemperatureCelcius, sizeof(convertedtemperatureCelcius));
  8000c70:	4639      	mov	r1, r7
  8000c72:	f8b7 312e 	ldrh.w	r3, [r7, #302]	; 0x12e
  8000c76:	2296      	movs	r2, #150	; 0x96
  8000c78:	4618      	mov	r0, r3
- 8000c7a:	f000 f9e1 	bl	8001040 <temp_value_to_Celsius>
+ 8000c7a:	f000 f9e1 	bl	8001040 <celisius_Conversion_Temperature>
 	  temp_value_to_Fahrenheit(converted_ADC_Value_t, convertedtemperatureFahrenheit, sizeof(convertedtemperatureFahrenheit));
  8000c7e:	f107 0198 	add.w	r1, r7, #152	; 0x98
  8000c82:	f8b7 312e 	ldrh.w	r3, [r7, #302]	; 0x12e
@@ -1485,12 +1485,12 @@ int main(void)
  8000d08:	20000190 	.word	0x20000190
  8000d0c:	20000144 	.word	0x20000144
 
-08000d10 <SystemClock_Config>:
+08000d10 <Configuration_of_SystemClock>:
 /**
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void)
+void Configuration_of_SystemClock(void)
 {
  8000d10:	b580      	push	{r7, lr}
  8000d12:	b094      	sub	sp, #80	; 0x50
@@ -1544,7 +1544,7 @@ void SystemClock_Config(void)
  8000d5e:	f001 fffb 	bl	8002d58 <HAL_RCC_OscConfig>
  8000d62:	4603      	mov	r3, r0
  8000d64:	2b00      	cmp	r3, #0
- 8000d66:	d001      	beq.n	8000d6c <SystemClock_Config+0x5c>
+ 8000d66:	d001      	beq.n	8000d6c <Configuration_of_SystemClock+0x5c>
   {
     Error_Handler();
  8000d68:	f000 f9da 	bl	8001120 <Error_Handler>
@@ -1576,7 +1576,7 @@ void SystemClock_Config(void)
  8000d8a:	f002 fa67 	bl	800325c <HAL_RCC_ClockConfig>
  8000d8e:	4603      	mov	r3, r0
  8000d90:	2b00      	cmp	r3, #0
- 8000d92:	d001      	beq.n	8000d98 <SystemClock_Config+0x88>
+ 8000d92:	d001      	beq.n	8000d98 <Configuration_of_SystemClock+0x88>
   {
     Error_Handler();
  8000d94:	f000 f9c4 	bl	8001120 <Error_Handler>
@@ -1593,7 +1593,7 @@ void SystemClock_Config(void)
  8000da4:	f002 fbe8 	bl	8003578 <HAL_RCCEx_PeriphCLKConfig>
  8000da8:	4603      	mov	r3, r0
  8000daa:	2b00      	cmp	r3, #0
- 8000dac:	d001      	beq.n	8000db2 <SystemClock_Config+0xa2>
+ 8000dac:	d001      	beq.n	8000db2 <Configuration_of_SystemClock+0xa2>
   {
     Error_Handler();
  8000dae:	f000 f9b7 	bl	8001120 <Error_Handler>
@@ -2067,11 +2067,11 @@ static void MX_GPIO_Init(void)
  8001038:	10110000 	.word	0x10110000
  800103c:	40011000 	.word	0x40011000
 
-08001040 <temp_value_to_Celsius>:
+08001040 <celisius_Conversion_Temperature>:
 
 /* USER CODE BEGIN 4 */
 
-void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
+void celisius_Conversion_Temperature(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
  8001040:	b580      	push	{r7, lr}
  8001042:	b086      	sub	sp, #24
  8001044:	af00      	add	r7, sp, #0
@@ -2091,7 +2091,7 @@ void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size
  8001056:	89fb      	ldrh	r3, [r7, #14]
  8001058:	4618      	mov	r0, r3
  800105a:	f7ff fafd 	bl	8000658 <__aeabi_i2d>
- 800105e:	a310      	add	r3, pc, #64	; (adr r3, 80010a0 <temp_value_to_Celsius+0x60>)
+ 800105e:	a310      	add	r3, pc, #64	; (adr r3, 80010a0 <celisius_Conversion_Temperature+0x60>)
  8001060:	e9d3 2300 	ldrd	r2, r3, [r3]
  8001064:	f7ff f87c 	bl	8000160 <__aeabi_dmul>
  8001068:	4602      	mov	r2, r0
@@ -2108,7 +2108,7 @@ void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size
  800107a:	4613      	mov	r3, r2
  800107c:	00db      	lsls	r3, r3, #3
  800107e:	4413      	add	r3, r2
- 8001080:	4a09      	ldr	r2, [pc, #36]	; (80010a8 <temp_value_to_Celsius+0x68>)
+ 8001080:	4a09      	ldr	r2, [pc, #36]	; (80010a8 <celisius_Conversion_Temperature+0x68>)
  8001082:	fba2 2303 	umull	r2, r3, r2, r3
  8001086:	089b      	lsrs	r3, r3, #2
  8001088:	3320      	adds	r3, #32
@@ -2117,7 +2117,7 @@ void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size
     // Format the temperature statements into a single string
     snprintf(convertedvalBuffer, bufferSize, "Cel: %lu C", Celsius_value);
  800108c:	697b      	ldr	r3, [r7, #20]
- 800108e:	4a07      	ldr	r2, [pc, #28]	; (80010ac <temp_value_to_Celsius+0x6c>)
+ 800108e:	4a07      	ldr	r2, [pc, #28]	; (80010ac <celisius_Conversion_Temperature+0x6c>)
  8001090:	6879      	ldr	r1, [r7, #4]
  8001092:	68b8      	ldr	r0, [r7, #8]
  8001094:	f002 fdac 	bl	8003bf0 <sniprintf>
