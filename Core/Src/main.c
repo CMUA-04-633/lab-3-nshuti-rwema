@@ -65,7 +65,7 @@ static void MX_ADC2_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
-void temp_conv_Celcius(uint16_t temp_var, char* outputBuffer, size_t bufferSize);
+void coversion_to_Celicius(uint16_t temp_var, char* outputBuffer, size_t bufferSize);
 void temp_conv_Fahrenheit(uint16_t temp_var, char* outputBuffer, size_t bufferSize);
 
 /* USER CODE END PFP */
@@ -127,7 +127,7 @@ int main(void)
 	  lux = HAL_ADC_GetValue(&hadc1);
 	  sprintf(msg, "The Light: %hu", lux);
 
-	  count_Flash(lux);
+	  flash_Countering(lux);
 
 
 	  /*START of LCD*/
@@ -144,7 +144,7 @@ int main(void)
 
 	  char temperatureOutputCelcius[100];
 	  char temperatureOutputFahrenheit[100];
-	  temp_conv_Celcius(ADC_Val, temperatureOutputCelcius, sizeof(temperatureOutputCelcius));
+	  coversion_to_Celicius(ADC_Val, temperatureOutputCelcius, sizeof(temperatureOutputCelcius));
 	  temp_conv_Fahrenheit(ADC_Val, temperatureOutputFahrenheit, sizeof(temperatureOutputFahrenheit));
 
 	  HAL_UART_Transmit(&huart2, temperatureOutputCelcius, strlen(temperatureOutputCelcius), HAL_MAX_DELAY);
@@ -416,47 +416,55 @@ void temp_conv_Fahrenheit(uint16_t temp_var, char* outputBuffer, size_t bufferSi
     uint32_t var1_Celsius = 0;
     uint32_t var1_Fahrenheit = 0;
 
-    // Convert temperature to Celsius
-    var1_Celsius = (temp_var * 0.05);
-
-    // Convert Celsius to Fahrenheit
-    var1_Fahrenheit = ((var1_Celsius * 9) / 5) + 32;
-
-    // Format the temperature statements into a single string
-    snprintf(outputBuffer, bufferSize, "°Fahrenheit: %lu F", var1_Fahrenheit);
-}
-
-void temp_conv_Celcius(uint16_t temp_var, char* outputBuffer, size_t bufferSize) {
-    uint32_t var1_Celsius = 0;
-    uint32_t var1_Fahrenheit = 0;
-
-    // Convert temperature to Celsius
-    var1_Celsius = (temp_var * 0.05);
-
-    // Convert Celsius to Fahrenheit
-    var1_Fahrenheit = ((var1_Celsius * 9) / 5) + 32;
-
-    // Format the temperature statements into a single string
-    snprintf(outputBuffer, bufferSize, "°Celcius: %lu C", var1_Celsius);
-}
-
-
-void count_Flash(int lux) {
-
-	static int count = 0;
-    if (lux > 4000) {
-
-    	count++;
+    // Nested function for Celsius to Fahrenheit conversion
+    uint32_t celsius_to_fahrenheit(uint32_t celsius) {
+        return ((celsius * 9) / 5) + 32;
     }
-    else if(count >= 5){
 
-    	count = 0;
+    // Convert temperature to Celsius
+    var1_Celsius = (temp_var * 0.05);
 
-    	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
-    		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-    	} else {
-    		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-    	}
+    // Convert Celsius to Fahrenheit using the nested function
+    var1_Fahrenheit = celsius_to_fahrenheit(var1_Celsius);
+
+    // Format the temperature statements into a single string
+    snprintf(outputBuffer, bufferSize, "°F: %lu F", var1_Fahrenheit);
+}
+
+
+void coversion_to_Celicius(uint16_t temp_var, char* outputBuffer, size_t bufferSize) {
+    uint32_t var1_Celsius = 0;
+
+    // Convert temperature to Celsius
+    var1_Celsius = (temp_var * 0.05);
+
+    // Format the temperature statement into a single string
+    snprintf(outputBuffer, bufferSize, "°C: %lu C", var1_Celsius);
+}
+
+
+
+void flash_Countering(int lux) {
+
+    static int count = 0;
+
+    switch (lux > 4000) {
+        case 1:
+            count++;
+            break;
+        case 0:
+            if (count >= 5) {
+                count = 0;
+                if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
+
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+                } else {
+
+                    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+                }
+            }
+            break;
     }
 }
 
