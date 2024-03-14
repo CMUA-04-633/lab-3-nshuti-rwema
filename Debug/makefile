@@ -60,8 +60,8 @@ all: main-build
 main-build: sensors_LCD.elf secondary-outputs
 
 # Tool invocations
-sensors_LCD.elf sensors_LCD.map: $(OBJS) $(USER_OBJS) D:\WorksGt\1.New\lab-3-embedded_sys_jniringi_dieudoni\STM32F103RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "sensors_LCD.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\WorksGt\1.New\lab-3-embedded_sys_jniringi_dieudoni\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="sensors_LCD.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+sensors_LCD.elf sensors_LCD.map: $(OBJS) $(USER_OBJS) D:\WorksGt\1.New\lab-3-nshuti-rwema\STM32F103RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "sensors_LCD.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\WorksGt\1.New\lab-3-nshuti-rwema\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="sensors_LCD.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
