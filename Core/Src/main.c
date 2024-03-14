@@ -65,7 +65,7 @@ char formated_msg[50];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void Configuration_of_SystemClock(void);
+void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
@@ -73,7 +73,7 @@ static void MX_ADC2_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
-void celisius_Conversion_Temperature(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize);
+void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize);
 void temp_value_to_Fahrenheit(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize);
 
 /* USER CODE END PFP */
@@ -134,7 +134,7 @@ int main(void)
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  Configuration_of_SystemClock();
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -187,7 +187,7 @@ int main(void)
 
 	  char convertedtemperatureCelcius[150];
 	  char convertedtemperatureFahrenheit[150];
-	  celisius_Conversion_Temperature(converted_ADC_Value_t, convertedtemperatureCelcius, sizeof(convertedtemperatureCelcius));
+	  temp_value_to_Celsius(converted_ADC_Value_t, convertedtemperatureCelcius, sizeof(convertedtemperatureCelcius));
 	  temp_value_to_Fahrenheit(converted_ADC_Value_t, convertedtemperatureFahrenheit, sizeof(convertedtemperatureFahrenheit));
 
 	  HAL_UART_Transmit(&huart2, convertedtemperatureCelcius, strlen(convertedtemperatureCelcius), HAL_MAX_DELAY);
@@ -215,7 +215,7 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-void Configuration_of_SystemClock(void)
+void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -448,7 +448,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void celisius_Conversion_Temperature(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
+void temp_value_to_Celsius(uint16_t temper_value, char* convertedvalBuffer, size_t bufferSize) {
     uint32_t Celsius_value = 0;
     uint32_t Fahrenheit_value = 0;
 
