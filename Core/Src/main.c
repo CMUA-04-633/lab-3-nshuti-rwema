@@ -80,7 +80,7 @@ void temp_conv_Fahrenheit(uint16_t temp_var, char* outputBuffer, size_t bufferSi
   * @retval int
   */
 int main(void)
-{
+ {
   /* USER CODE BEGIN 1 */
   uint16_t ADC_Val;
   /* USER CODE END 1 */
