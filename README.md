@@ -18,8 +18,11 @@ Our Lab-3 showcases a meticulously designed environmental monitoring and control
 
 **Error Handling Function:** - The error handling function (Error_Handler) is called in case of critical errors encountered during the program's execution. It typically disables interrupts and enters an infinite loop to halt the system's operation and indicate an error condition.
 
-### The Output/Demo:
+#### The Output/Demo:
+![Demo](https://github.com/CMUA-04-633/lab-3-nshuti-rwema/assets/52289151/1ee65521-7aca-4d40-9d8e-07121e17626c)
 
+### When Flashes count turns 5, The LED turns ON
+![IMG_20240314_200929_186](https://github.com/CMUA-04-633/lab-3-nshuti-rwema/assets/52289151/49a6d7b7-eb63-4317-b0ad-af98ff0b12b0)
 ---
 # Challenges :'('  -:')
 
